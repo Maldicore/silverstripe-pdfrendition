@@ -8,9 +8,9 @@
  */
 
 class PdfAdmin extends ModelAdmin {
-	public static $url_segment = 'pdfs';
-	public static $menu_title = 'PDFs';
-	public static $managed_models = array(
+	private static $url_segment = 'pdfs';
+	private static $menu_title = 'PDFs';
+	private static $managed_models = array(
 		'ComposedPdf',
 	);
 	
@@ -29,6 +29,7 @@ class PdfAdmin extends ModelAdmin {
 		$id = $this->request->getVar('ID');
 		if ($id) {
 			$pdf = ComposedPdf::get_by_id('ComposedPdf', $id);
+			// $pdf = ComposedPdf::get()->byID($id);
 			if ($pdf->canView()) {
 				return $pdf->renderPdf();
 			}
@@ -48,6 +49,7 @@ class PdfAdmin extends ModelAdmin {
 		$id = $this->request->getVar('ID');
 		if ($id) {
 			$pdf = ComposedPdf::get_by_id('ComposedPdf', $id);
+			// $pdf = ComposedPdf::get()->byID($id);
 			if ($pdf->canView()) {
 				$pdf->createPdf();
 				Session::set('PdfComposed', true);

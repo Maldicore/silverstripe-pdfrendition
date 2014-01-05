@@ -9,21 +9,21 @@
 
 class ComposedPdf extends DataObject {
 
-	public static $db = array(
+	private static $db = array(
 		'Title'					=> 'Varchar(125)',
 		'Description'			=> 'HTMLText',
 		'TableOfContents'		=> 'Boolean',
 		'Template'				=> 'Varchar',
 	);
-	public static $defaults = array(
+	private static $defaults = array(
 		
 	);
 	
-	public static $has_one = array(
+	private static $has_one = array(
 		'Page'					=> 'Page',
 	);
 
-	public static $has_many = array(
+	private static $has_many = array(
 		'Pdfs'					=> 'ComposedPdfFile',
 	);
 	
@@ -59,25 +59,31 @@ class ComposedPdf extends DataObject {
 		$fields->addFieldToTab('Root.Main', new DropdownField('Template', _t('ComposedPdf.TEMPLATE', 'Template'), $this->templateSource()), 'Description');
 		$fields->addFieldToTab('Root.Main', new TreeDropdownField('PageID', _t('ComposedPdf.ROOT_PAGE', 'Root Page'), 'Page'), 'Description');
 		
-		$pdfs = new TableListField(
-			'Pdfs',
+		$pdfs = new GridField(
 			'ComposedPdfFile',
-			array(
-					'Title'                                 => 'Title',
-					'Created'                               => 'Generated',
-					'ID'                                    => 'Links'
-			),
-			'"SourceID" = '.((int) $this->ID),
-			'"Created" DESC'
-		);
+			'Pdfs',
+			$this->Pdfs()
+			);
 
-		$pdfs->setShowPagination(true);
+		// $pdfs = new TableListField(
+		// 	'ComposedPdfFile',
+		// 	'Pdfs',
+		// 	array(
+		// 			'Title'                                 => 'Title',
+		// 			'Created'                               => 'Generated',
+		// 			'ID'                                    => 'Links'
+		// 	),
+		// 	'"SourceID" = '.((int) $this->ID),
+		// 	'"Created" DESC'
+		// );
 
-		$links = '<a class=\'pdfDownloadLink\' target=\'blank\' href=\'".$Link()."\'>Download</a> ';
+		// $pdfs->setShowPagination(true);
 
-		$pdfs->setFieldFormatting(array(
-				'ID' => $links,
-		));
+		// $links = '<a class=\'pdfDownloadLink\' target=\'blank\' href=\'".$Link()."\'>Download</a> ';
+
+		// $pdfs->setFieldFormatting(array(
+		// 		'ID' => $links,
+		// ));
 		
 		$fields->addFieldToTab('Root.Pdfs', $pdfs);
 
@@ -93,6 +99,7 @@ class ComposedPdf extends DataObject {
 	public function createPdf() {
 		$storeIn = $this->getStorageFolder();
 		$name = preg_replace('# +#','-',trim($this->Title));
+		// $name = FileNameFilter::create()->filter($this->Title);
 		$name = preg_replace('#[^A-Za-z0-9.+_\-]#','',$name);
 		$name = $name . '.pdf';
 		
@@ -143,8 +150,8 @@ class ComposedPdf extends DataObject {
 	
 	public function templatePaths() {
 		if (!count(self::$template_paths)) {
-			if (file_exists(Director::baseFolder() . DIRECTORY_SEPARATOR . THEMES_DIR . "/" . SSViewer::current_theme() . "/templates/pdfs")) {
-				self::$template_paths[] = THEMES_DIR . "/" . SSViewer::current_theme() . "/templates/pdfs";
+			if (file_exists(Director::baseFolder() . DIRECTORY_SEPARATOR . THEMES_DIR . "/" . $this->config()->get('SSViewer.theme') . "/templates/pdfs")) {
+				self::$template_paths[] = THEMES_DIR . "/" . $this->config()->get('SSViewer.theme') . "/templates/pdfs";
 			}
 
 			if (file_exists(Director::baseFolder() . DIRECTORY_SEPARATOR . project() . '/templates/pdfs')) {
@@ -165,7 +172,8 @@ class ComposedPdf extends DataObject {
 	 * @return array
 	 */
 	public function templateSource() {
-		$paths = self::$this->templatePaths();
+		$paths = $this->templatePaths();
+
 		$templates = array("" => _t('ComposedPdf.NONE', 'None'));
 
 		if (isset($paths) && count($paths)) {

@@ -8,7 +8,7 @@
  */
 
 class PdfControllerExtension extends Extension {
-    static $allowed_actions = array(
+    private static $allowed_actions = array(
 		'topdf',
 	);
 

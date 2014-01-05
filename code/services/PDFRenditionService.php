@@ -9,8 +9,8 @@
 
 class PDFRenditionService {
 
-	public static $tidy_bin = "/usr/bin/tidy";
-	public static $java_bin = "/usr/bin/java";
+	private static $tidy_bin = "/usr/bin/tidy";
+	private static $java_bin = "/usr/bin/java";
 
 	public function __construct() {
 		

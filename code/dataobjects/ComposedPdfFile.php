@@ -8,7 +8,7 @@
  */
 
 class ComposedPdfFile extends File {
-	public static $has_one = array(
+	private static $has_one = array(
 		'Source'			=> 'ComposedPdf',
 	);
 }
